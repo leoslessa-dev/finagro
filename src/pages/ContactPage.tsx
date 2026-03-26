@@ -17,10 +17,14 @@ export default function ContactPage() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Using Formspree for a real email submission to finagro.consultoria@gmail.com
     const formData = new FormData(e.currentTarget);
+    
+    // Configurações recomendadas pelo FormSubmit
+    formData.append('_captcha', 'false');
+    formData.append('_subject', 'Novo contato via Site Finagro');
+    
     try {
-      const response = await fetch("https://formspree.io/finagro.consultoria@gmail.com", {
+      const response = await fetch("https://formsubmit.co/ajax/finagro.consultoria@gmail.com", {
         method: "POST",
         body: formData,
         headers: {
@@ -28,13 +32,21 @@ export default function ContactPage() {
         }
       });
       
-      if (response.ok) {
+      const result = await response.json();
+      
+      // O FormSubmit retorna success: true ou success: "true"
+      if (response.ok && (result.success === true || result.success === "true")) {
         setIsSubmitted(true);
       } else {
-        alert("Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.");
+        throw new Error(result.message || "Erro no servidor");
       }
-    } catch (error) {
-      alert("Erro de conexão. Verifique sua internet.");
+    } catch (error: any) {
+      console.error("Erro no envio:", error);
+      if (error.message && error.message.includes("Activation")) {
+        alert("O formulário ainda não foi ativado. Por favor, verifique o e-mail finagro.consultoria@gmail.com e clique no link de ativação enviado pelo FormSubmit.");
+      } else {
+        alert("Ocorreu um erro ao enviar. Por favor, tente novamente mais tarde ou entre em contato via WhatsApp.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +130,6 @@ export default function ContactPage() {
           <div className="lg:col-span-2">
             <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
               <form onSubmit={handleSubmit} className="space-y-6">
-                <input type="hidden" name="_to" value="finagro.consultoria@gmail.com" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-bold text-finagro-green-dark uppercase tracking-wider">Nome Completo</label>
