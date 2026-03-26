@@ -20,7 +20,7 @@ export default function ContactPage() {
     // Using Formspree for a real email submission to finagro.consultoria@gmail.com
     const formData = new FormData(e.currentTarget);
     try {
-      const response = await fetch("https://formspree.io/f/xpwqndrv", { // Note: This is an example ID, I'll use the user's email directly if possible or just provide the structure
+      const response = await fetch("https://formspree.io/finagro.consultoria@gmail.com", {
         method: "POST",
         body: formData,
         headers: {
